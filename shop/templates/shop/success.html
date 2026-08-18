@@ -1,3 +1,5 @@
 {% extends 'shop/base.html' %}
 {% block title %}Заказ принят — LAVANDA{% endblock %}
-{% block content %}<section class="success-page"><div class="success-card"><div class="success-icon">✓</div><div class="eyebrow">ЗАЯВКА ПРИНЯТА</div><h1>Почти готово!</h1><p>Это демо оформления заказа. На следующем этапе здесь можно подключить оплату или подтверждение менеджером.</p><a class="btn primary" href="{% url 'catalog' %}">Вернуться в каталог</a></div></section>{% endblock %}
+{% block content %}
+<section class="success-page"><div class="success-card"><div class="success-icon">✓</div><div class="eyebrow">ДЕМО-ЗАКАЗ</div><h1>Заявка принята</h1><p>Спасибо! Данные заказа сохранены только в браузере для демонстрации. Реальная оплата не производится.</p><a class="btn primary" href="{% url 'home' %}">Вернуться на главную</a></div></section>
+{% endblock %}

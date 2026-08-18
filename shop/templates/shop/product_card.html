@@ -1,4 +1,4 @@
 <article class="product">
   <div class="product-img"><img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy">{% if p.is_hit %}<span class="tag">Хит</span>{% endif %}</div>
-  <div class="product-info"><h3>{{ p.name }}</h3><p>{{ p.description|default:'Авторский букет • свежие цветы'|truncatechars:55 }}</p><div class="product-bottom"><span class="price">{{ p.price|floatformat:0 }} ₽</span><a class="add" href="{% url 'add_to_cart' p.id %}" aria-label="Добавить {{ p.name }}">+</a></div></div>
+  <div class="product-info"><h3>{{ p.name }}</h3><p>{{ p.description|default:'Авторский букет • свежие цветы'|truncatechars:55 }}</p><div class="product-bottom"><span class="price">{{ p.price|floatformat:0 }} ₽</span><button class="add" type="button" data-add="{{ p.id }}" aria-label="Добавить {{ p.name }}">+</button></div></div>
 </article>

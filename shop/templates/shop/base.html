@@ -2,29 +2,20 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="LAVANDA — цветы с доставкой по городу">
 <title>{% block title %}LAVANDA — цветы с доставкой{% endblock %}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'shop/style.css' %}">
 </head>
 <body>
 <header class="header">
   <a class="logo" href="{% url 'home' %}">LAVANDA<span>FLOWERS</span></a>
-  <nav>
-    <a href="{% url 'catalog' %}">Каталог</a>
-    <a href="{% url 'home' %}#about">О нас</a>
-    <a href="{% url 'home' %}#delivery">Доставка</a>
-    <a href="{% url 'home' %}#contacts">Контакты</a>
-  </nav>
-  <button class="cart-btn" id="cartOpen" type="button" onclick="openCart()">Корзина <span id="cartCount">{{ cart_count }}</span></button>
+  <nav><a href="{% url 'catalog' %}">Каталог</a><a href="{% url 'home' %}#about">О нас</a><a href="{% url 'home' %}#delivery">Доставка</a><a href="{% url 'home' %}#contacts">Контакты</a></nav>
+  <button class="cart-btn" id="cartOpen" type="button">Корзина <span id="cartCount">0</span></button>
 </header>
-{% if messages %}
-<div class="toast-wrap">{% for message in messages %}<div class="toast">{{ message }}</div>{% endfor %}</div>
-{% endif %}
+<div class="toast-wrap" id="toastWrap"></div>
 {% block content %}{% endblock %}
 <footer id="contacts">
   <div class="footer-brand"><a class="logo" href="{% url 'home' %}">LAVANDA<span>FLOWERS</span></a><p>Цветы для важных моментов.</p></div>
@@ -34,34 +25,51 @@
 </footer>
 
 <div class="overlay" id="overlay"></div>
-<aside class="cart-drawer" id="cart">
-  <div class="cart-head"><h3>Ваша корзина</h3><button id="cartClose" type="button">×</button></div>
-  <div class="cart-items" id="cartItems">
-    {% if cart_items %}
-      {% for p,q in cart_items %}
-      <div class="cart-item">
-        <img src="{{ p.image }}" alt="{{ p.name }}">
-        <div><h4>{{ p.name }}</h4><p>{{ p.price|floatformat:0 }} ₽ × {{ q }}</p></div>
-        <a class="remove" href="{% url 'remove_from_cart' p.id %}">×</a>
-      </div>
-      {% endfor %}
-    {% else %}<div class="empty">Корзина пока пуста 🌷</div>{% endif %}
-  </div>
-  <div class="cart-bottom">
-    <div><span>Итого</span><strong id="cartTotal">{{ cart_total|floatformat:0 }} ₽</strong></div>
-    {% if cart_count %}<a class="btn primary full" href="{% url 'checkout' %}">Оформить заказ</a>{% else %}<a class="btn primary full" href="{% url 'catalog' %}">Выбрать букет</a>{% endif %}
-  </div>
+<aside class="cart-drawer" id="cart" aria-hidden="true">
+  <div class="cart-head"><div><div class="eyebrow">ВАШ ЗАКАЗ</div><h3>Корзина</h3></div><button id="cartClose" type="button" aria-label="Закрыть">×</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-bottom"><div><span>Итого</span><strong id="cartTotal">0 ₽</strong></div><a class="btn primary full" id="checkoutLink" href="{% url 'checkout' %}">Оформить заказ</a></div>
 </aside>
 
 <script>
-window.LAVANDA = { cartCount: {{ cart_count|default:0 }}, cartTotal: {{ cart_total|default:0 }} };
-function openCart(){document.getElementById('cart').classList.add('open');document.getElementById('overlay').classList.add('show');}
-function closeCart(){document.getElementById('cart').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
-document.getElementById('cartOpen').addEventListener('click',openCart);
-document.getElementById('cartClose').addEventListener('click',closeCart);
-document.getElementById('overlay').addEventListener('click',closeCart);
-if (new URLSearchParams(window.location.search).get("cart") === "1") { openCart(); history.replaceState({}, document.title, window.location.pathname + window.location.hash); }
-setTimeout(()=>document.querySelectorAll('.toast').forEach(x=>x.remove()),3200);
+window.LAVANDA_PRODUCTS = {{ products_json|safe }};
+window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v4' };
+(function(){
+  const $ = s => document.querySelector(s);
+  const products = window.LAVANDA_PRODUCTS || [];
+  const productMap = Object.fromEntries(products.map(p => [String(p.id), p]));
+  const cart = () => { try { return JSON.parse(localStorage.getItem(window.LAVANDA.key) || '{}') || {}; } catch(e){ return {}; } };
+  const save = c => localStorage.setItem(window.LAVANDA.key, JSON.stringify(c));
+  const money = n => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
+  const count = c => Object.values(c).reduce((s,n)=>s + Math.max(0, Number(n)||0),0);
+  function render(){
+    const c=cart(), items=[]; let total=0;
+    Object.keys(c).forEach(id=>{ const p=productMap[id], q=Number(c[id]); if(p && q>0){ items.push([p,q]); total += p.price*q; }});
+    $('#cartCount').textContent=count(c);
+    $('#cartTotal').textContent=money(total);
+    const box=$('#cartItems');
+    if(!items.length){ box.innerHTML='<div class="empty"><div style="font-size:34px;margin-bottom:10px">🌷</div><h3>Корзина пока пуста</h3><p>Выберите букет, который понравится.</p></div>'; }
+    else box.innerHTML=items.map(([p,q])=>`<div class="cart-item"><img src="${p.image}" alt="${escapeHtml(p.name)}"><div><h4>${escapeHtml(p.name)}</h4><p>${money(p.price)} × ${q}</p><div class="qty"><button type="button" data-minus="${p.id}">−</button><b>${q}</b><button type="button" data-plus="${p.id}">+</button></div></div><button class="remove" type="button" data-remove="${p.id}" aria-label="Удалить">×</button></div>`).join('');
+    $('#checkoutLink').classList.toggle('disabled', !items.length);
+  }
+  function escapeHtml(s){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
+  function openCart(){ render(); $('#cart').classList.add('open'); $('#cart').setAttribute('aria-hidden','false'); $('#overlay').classList.add('show'); document.body.classList.add('cart-lock'); }
+  function closeCart(){ $('#cart').classList.remove('open'); $('#cart').setAttribute('aria-hidden','true'); $('#overlay').classList.remove('show'); document.body.classList.remove('cart-lock'); }
+  function add(id){const c=cart(); c[id]=(Number(c[id])||0)+1; save(c); render(); toast('Букет добавлен в корзину'); openCart();}
+  function change(id,d){const c=cart(); c[id]=(Number(c[id])||0)+d; if(c[id]<=0) delete c[id]; save(c); render();}
+  function toast(t){const el=document.createElement('div');el.className='toast';el.textContent=t;$('#toastWrap').appendChild(el);setTimeout(()=>el.remove(),2200);}
+  document.addEventListener('click',e=>{
+    const addBtn=e.target.closest('[data-add]'); if(addBtn){e.preventDefault();add(addBtn.dataset.add);return;}
+    const plus=e.target.closest('[data-plus]'); if(plus){change(plus.dataset.plus,1);return;}
+    const minus=e.target.closest('[data-minus]'); if(minus){change(minus.dataset.minus,-1);return;}
+    const rem=e.target.closest('[data-remove]'); if(rem){const c=cart();delete c[rem.dataset.remove];save(c);render();return;}
+  });
+  $('#cartOpen').addEventListener('click',openCart); $('#cartClose').addEventListener('click',closeCart); $('#overlay').addEventListener('click',closeCart);
+  $('#checkoutLink').addEventListener('click',e=>{if(count(cart())===0)e.preventDefault();});
+  window.LAVANDA_CART={cart,save,render,openCart,closeCart,count,products,productMap,money};
+  render();
+  window.addEventListener('pageshow',render);
+})();
 </script>
 {% block scripts %}{% endblock %}
 </body></html>

@@ -1,6 +1,10 @@
 {% extends 'shop/base.html' %}
 {% block title %}Корзина — LAVANDA{% endblock %}
 {% block content %}
-<section class="section cart-page"><div class="eyebrow">ВАШ ЗАКАЗ</div><h1>Корзина</h1>
-{% if items %}<div class="cart-list">{% for p,q in items %}<div class="cart-row"><img src="{{ p.image }}" alt="{{ p.name }}"><div><h3>{{ p.name }}</h3><p>{{ p.description }}</p></div><b>{{ p.price|floatformat:0 }} ₽ × {{ q }}</b><a href="{% url 'remove_from_cart' p.id %}">Удалить</a></div>{% endfor %}</div><div class="cart-summary"><span>Итого</span><strong>{{ total|floatformat:0 }} ₽</strong><a class="btn primary" href="{% url 'checkout' %}">Оформить заказ</a></div>{% else %}<div class="empty"><h2>Корзина пуста 🌷</h2><a class="btn primary" href="{% url 'catalog' %}">Перейти в каталог</a></div>{% endif %}</section>
+<section class="section cart-page"><div class="eyebrow">ВАШ ЗАКАЗ</div><h1>Корзина</h1><div class="cart-page-box" id="cartPageBox"></div></section>
 {% endblock %}
+{% block scripts %}<script>
+(function(){
+ const box=document.getElementById('cartPageBox');
+ function render(){const c=LAVANDA_CART.cart();const items=[];let total=0;Object.keys(c).forEach(id=>{const p=LAVANDA_CART.productMap[id],q=+c[id];if(p&&q>0){items.push([p,q]);total+=p.price*q;}});if(!items.length){box.innerHTML='<div class="empty"><h2>Корзина пуста 🌷</h2><a class="btn primary" href="{% url 'catalog' %}">Перейти в каталог</a></div>';return;}box.innerHTML='<div class="cart-list">'+items.map(([p,q])=>`<div class="cart-row"><img src="${p.image}" alt="${p.name}"><div><h3>${p.name}</h3><p>${p.description||''}</p><div class="qty"><button data-minus="${p.id}">−</button><b>${q}</b><button data-plus="${p.id}">+</button></div></div><strong>${LAVANDA_CART.money(p.price*q)}</strong><button class="text-danger" data-remove="${p.id}">Удалить</button></div>`).join('')+'</div><div class="cart-summary"><span>Итого</span><strong>'+LAVANDA_CART.money(total)+'</strong><a class="btn primary" href="{% url 'checkout' %}">Оформить заказ</a></div>';} render();window.addEventListener('storage',render);document.addEventListener('click',()=>setTimeout(render,0));})();
+</script>{% endblock %}
