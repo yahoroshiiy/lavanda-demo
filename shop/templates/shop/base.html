@@ -20,7 +20,7 @@
     <a href="{% url 'home' %}#delivery">Доставка</a>
     <a href="{% url 'home' %}#contacts">Контакты</a>
   </nav>
-  <button class="cart-btn" id="cartOpen" type="button">Корзина <span id="cartCount">{{ cart_count }}</span></button>
+  <button class="cart-btn" id="cartOpen" type="button" onclick="openCart()">Корзина <span id="cartCount">{{ cart_count }}</span></button>
 </header>
 {% if messages %}
 <div class="toast-wrap">{% for message in messages %}<div class="toast">{{ message }}</div>{% endfor %}</div>
@@ -60,7 +60,7 @@ function closeCart(){document.getElementById('cart').classList.remove('open');do
 document.getElementById('cartOpen').addEventListener('click',openCart);
 document.getElementById('cartClose').addEventListener('click',closeCart);
 document.getElementById('overlay').addEventListener('click',closeCart);
-{% if cart_open %}openCart();{% endif %}
+if (new URLSearchParams(window.location.search).get("cart") === "1") { openCart(); history.replaceState({}, document.title, window.location.pathname + window.location.hash); }
 setTimeout(()=>document.querySelectorAll('.toast').forEach(x=>x.remove()),3200);
 </script>
 {% block scripts %}{% endblock %}

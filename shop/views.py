@@ -25,9 +25,16 @@ def add_to_cart(request, product_id):
     key = str(product.id)
     cart[key] = int(cart.get(key, 0)) + 1
     request.session["cart"] = cart
-    request.session["cart_open"] = True
     messages.success(request, f"«{product.name}» добавлен в корзину")
-    return redirect(request.META.get("HTTP_REFERER", "home"))
+    referer = request.META.get("HTTP_REFERER")
+    if referer:
+        from urllib.parse import urlsplit, parse_qsl, urlencode, urlunsplit
+        parts = urlsplit(referer)
+        query = dict(parse_qsl(parts.query))
+        query["cart"] = "1"
+        referer = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+        return redirect(referer)
+    return redirect("home")
 
 def remove_from_cart(request, product_id):
     cart = request.session.get("cart", {})
