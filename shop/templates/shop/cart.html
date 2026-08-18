@@ -1,0 +1,6 @@
+{% extends 'shop/base.html' %}
+{% block title %}Корзина — LAVANDA{% endblock %}
+{% block content %}
+<section class="section cart-page"><div class="eyebrow">ВАШ ЗАКАЗ</div><h1>Корзина</h1>
+{% if items %}<div class="cart-list">{% for p,q in items %}<div class="cart-row"><img src="{{ p.image }}" alt="{{ p.name }}"><div><h3>{{ p.name }}</h3><p>{{ p.description }}</p></div><b>{{ p.price|floatformat:0 }} ₽ × {{ q }}</b><a href="{% url 'remove_from_cart' p.id %}">Удалить</a></div>{% endfor %}</div><div class="cart-summary"><span>Итого</span><strong>{{ total|floatformat:0 }} ₽</strong><a class="btn primary" href="{% url 'checkout' %}">Оформить заказ</a></div>{% else %}<div class="empty"><h2>Корзина пуста 🌷</h2><a class="btn primary" href="{% url 'catalog' %}">Перейти в каталог</a></div>{% endif %}</section>
+{% endblock %}

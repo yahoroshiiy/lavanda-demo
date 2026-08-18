@@ -1,0 +1,5 @@
+{% extends 'shop/base.html' %}
+{% block title %}Оформление — LAVANDA{% endblock %}
+{% block content %}
+<section class="section checkout-page"><div class="checkout-box"><div><div class="eyebrow">ОФОРМЛЕНИЕ</div><h1>Доставка букета</h1><p class="muted">Заполните данные — заказ сразу появится в админ-панели.</p><form method="post">{% csrf_token %}<input required name="name" placeholder="Ваше имя"><input required name="phone" placeholder="Телефон"><input required name="address" placeholder="Адрес доставки"><select name="delivery_time"><option>Сегодня, 18:00–20:00</option><option>Сегодня, 20:00–22:00</option><option>Завтра, 10:00–12:00</option></select><textarea name="comment" placeholder="Комментарий к заказу"></textarea><button class="btn primary full" type="submit">Подтвердить заказ</button></form></div><div class="order-preview"><h3>Ваш заказ</h3>{% for p,q in items %}<div><span>{{ p.name }} × {{ q }}</span><b>{{ p.price|floatformat:0 }} ₽</b></div>{% endfor %}<hr><strong>Итого: {{ total|floatformat:0 }} ₽</strong></div></div></section>
+{% endblock %}

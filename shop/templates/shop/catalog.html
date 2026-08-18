@@ -1,0 +1,9 @@
+{% extends 'shop/base.html' %}
+{% block title %}Каталог — LAVANDA{% endblock %}
+{% block content %}
+<section class="section catalog-page">
+  <div class="section-head"><div><div class="eyebrow">КАТАЛОГ</div><h1>Букеты LAVANDA</h1></div><div class="filters"><a class="filter {% if not selected %}active{% endif %}" href="{% url 'catalog' %}">Все</a>{% for c in categories %}<a class="filter {% if selected == c.slug %}active{% endif %}" href="?category={{ c.slug }}">{{ c.name }}</a>{% endfor %}</div></div>
+  <div class="catalog-note">{% if selected %}Подборка букетов из категории «{{ selected }}»{% else %}Авторские композиции для важных моментов{% endif %}</div>
+  <div class="grid">{% for p in products %}{% include 'shop/product_card.html' %}{% empty %}<div class="empty">Пока нет букетов.</div>{% endfor %}</div>
+</section>
+{% endblock %}
