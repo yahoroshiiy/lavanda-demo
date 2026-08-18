@@ -47,29 +47,34 @@ def cart(request):
     total = sum(p.price * q for p, q in items)
     return render(request, "shop/cart.html", {"items": items, "total": total})
 
-@transaction.atomic
 def checkout(request):
     cart_data = request.session.get("cart", {})
-    products = Product.objects.filter(id__in=[int(x) for x in cart_data.keys()], is_active=True)
-    items = [(p, int(cart_data.get(str(p.id), 0))) for p in products]
+    ids = [int(x) for x in cart_data.keys() if str(x).isdigit()]
+    products = Product.objects.filter(id__in=ids, is_active=True)
+    items = [(p, int(cart_data.get(str(p.id), 0))) for p in products if int(cart_data.get(str(p.id), 0)) > 0]
     if not items:
         return redirect("catalog")
     total = sum(p.price * q for p, q in items)
+
     if request.method == "POST":
-        order = Order.objects.create(
-            name=request.POST.get("name", ""),
-            phone=request.POST.get("phone", ""),
-            address=request.POST.get("address", ""),
-            delivery_time=request.POST.get("delivery_time", ""),
-            comment=request.POST.get("comment", ""),
-            total=total,
-        )
-        for product, quantity in items:
-            OrderItem.objects.create(order=order, product=product, price=product.price, quantity=quantity)
+        # Demo checkout: deliberately stops before payment/database write.
+        # This keeps the Vercel demo fully functional on a read-only filesystem.
+        request.session["demo_order"] = {
+            "name": request.POST.get("name", ""),
+            "phone": request.POST.get("phone", ""),
+            "address": request.POST.get("address", ""),
+            "delivery_time": request.POST.get("delivery_time", ""),
+            "comment": request.POST.get("comment", ""),
+            "total": str(total),
+            "items": [{"name": p.name, "quantity": q, "price": str(p.price)} for p, q in items],
+        }
         request.session["cart"] = {}
-        return redirect("order_success", order_id=order.id)
+        return redirect("order_success")
+
     return render(request, "shop/checkout.html", {"items": items, "total": total})
 
-def order_success(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+def order_success(request):
+    order = request.session.get("demo_order")
+    if not order:
+        return redirect("home")
     return render(request, "shop/success.html", {"order": order})

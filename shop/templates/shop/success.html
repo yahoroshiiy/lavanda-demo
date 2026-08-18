@@ -1,3 +1,3 @@
 {% extends 'shop/base.html' %}
 {% block title %}Заказ принят — LAVANDA{% endblock %}
-{% block content %}<section class="success-page"><div class="success-card"><div class="success-icon">✓</div><div class="eyebrow">ЗАКАЗ №{{ order.id }}</div><h1>Спасибо за заказ!</h1><p>Мы получили заявку и скоро свяжемся с вами по телефону.</p><a class="btn primary" href="{% url 'catalog' %}">Вернуться в каталог</a></div></section>{% endblock %}
+{% block content %}<section class="success-page"><div class="success-card"><div class="success-icon">✓</div><div class="eyebrow">ЗАЯВКА ПРИНЯТА</div><h1>Почти готово!</h1><p>Это демо оформления заказа. На следующем этапе здесь можно подключить оплату или подтверждение менеджером.</p><a class="btn primary" href="{% url 'catalog' %}">Вернуться в каталог</a></div></section>{% endblock %}
