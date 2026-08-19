@@ -2,38 +2,48 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="LAVANDA — цветы с доставкой по городу">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="LAVANDA — свежие букеты ручной работы с доставкой день-в-день.">
 <title>{% block title %}LAVANDA — цветы с доставкой{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'shop/style.css' %}">
 </head>
 <body>
+<div class="announcement">Бесплатная доставка от 5 000 ₽ <span>•</span> сегодня принимаем заказы до 20:30</div>
 <header class="header">
-  <a class="logo" href="{% url 'home' %}">LAVANDA<span>FLOWERS</span></a>
-  <nav><a href="{% url 'catalog' %}">Каталог</a><a href="{% url 'home' %}#about">О нас</a><a href="{% url 'home' %}#delivery">Доставка</a><a href="{% url 'home' %}#contacts">Контакты</a></nav>
-  <button class="cart-btn" id="cartOpen" type="button">Корзина <span id="cartCount">0</span></button>
+  <a class="logo" href="{% url 'home' %}"><span class="logo-mark">L</span><span class="logo-name">LAVANDA</span><span class="logo-sub">FLOWER STUDIO</span></a>
+  <nav class="desktop-nav"><a href="{% url 'catalog' %}">Букеты</a><a href="{% url 'home' %}#about">О нас</a><a href="{% url 'home' %}#delivery">Доставка</a><a href="{% url 'home' %}#contacts">Контакты</a></nav>
+  <button class="cart-btn" id="cartOpen" type="button"><span class="cart-label">Корзина</span><span id="cartCount">0</span></button>
 </header>
 <div class="toast-wrap" id="toastWrap"></div>
 {% block content %}{% endblock %}
 <footer id="contacts">
-  <div class="footer-brand"><a class="logo" href="{% url 'home' %}">LAVANDA<span>FLOWERS</span></a><p>Цветы для важных моментов.</p></div>
-  <div><small>КОНТАКТЫ</small><a href="tel:+79991234567">+7 (999) 123-45-67</a><a href="mailto:hello@lavanda.ru">hello@lavanda.ru</a></div>
-  <div><small>МЫ В СОЦСЕТЯХ</small><a href="#">Telegram</a><a href="#">VK</a></div>
-  <div><small>АДРЕС</small><p>ул. Ленина, 10<br>Ежедневно 09:00–21:00</p></div>
+  <div class="footer-brand"><a class="logo footer-logo" href="{% url 'home' %}"><span class="logo-mark">L</span><span class="logo-name">LAVANDA</span><span class="logo-sub">FLOWER STUDIO</span></a><p>Цветы, которые хочется дарить.</p></div>
+  <div><small>КЛИЕНТАМ</small><a href="{% url 'catalog' %}">Каталог</a><a href="{% url 'home' %}#delivery">Доставка и оплата</a><a href="{% url 'home' %}#about">О студии</a></div>
+  <div><small>КОНТАКТЫ</small><a href="tel:+79991234567">+7 (999) 123-45-67</a><a href="mailto:hello@lavanda.ru">hello@lavanda.ru</a><a href="#">Telegram</a></div>
+  <div><small>СТУДИЯ</small><p>ул. Ленина, 10<br>Ежедневно 09:00–21:00</p></div>
 </footer>
 
 <div class="overlay" id="overlay"></div>
 <aside class="cart-drawer" id="cart" aria-hidden="true">
-  <div class="cart-head"><div><div class="eyebrow">ВАШ ЗАКАЗ</div><h3>Корзина</h3></div><button id="cartClose" type="button" aria-label="Закрыть">×</button></div>
+  <div class="cart-head"><div><div class="eyebrow">ВАШ ВЫБОР</div><h3>Корзина</h3></div><button id="cartClose" type="button" aria-label="Закрыть">×</button></div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-bottom"><div><span>Итого</span><strong id="cartTotal">0 ₽</strong></div><a class="btn primary full" id="checkoutLink" href="{% url 'checkout' %}">Оформить заказ</a></div>
 </aside>
 
+<div class="product-modal" id="productModal" aria-hidden="true">
+  <div class="product-modal-card">
+    <button class="modal-close" id="productModalClose" type="button" aria-label="Закрыть">×</button>
+    <div class="product-modal-image"><img id="modalImage" src="" alt=""></div>
+    <div class="product-modal-copy"><div class="eyebrow" id="modalCategory">БУКЕТ</div><h2 id="modalName"></h2><p id="modalDescription"></p><div class="modal-meta"><strong id="modalPrice"></strong><span>Свежая сборка в день доставки</span></div><button class="btn primary full" id="modalAdd" type="button">Добавить в корзину</button></div>
+  </div>
+</div>
+
 <script>
 window.LAVANDA_PRODUCTS = {{ products_json|safe }};
-window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v4' };
+window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v5' };
 (function(){
   const $ = s => document.querySelector(s);
   const products = window.LAVANDA_PRODUCTS || [];
@@ -42,33 +52,35 @@ window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v4
   const save = c => localStorage.setItem(window.LAVANDA.key, JSON.stringify(c));
   const money = n => new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₽';
   const count = c => Object.values(c).reduce((s,n)=>s + Math.max(0, Number(n)||0),0);
+  function escapeHtml(s){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
   function render(){
     const c=cart(), items=[]; let total=0;
     Object.keys(c).forEach(id=>{ const p=productMap[id], q=Number(c[id]); if(p && q>0){ items.push([p,q]); total += p.price*q; }});
-    $('#cartCount').textContent=count(c);
-    $('#cartTotal').textContent=money(total);
+    $('#cartCount').textContent=count(c); $('#cartTotal').textContent=money(total);
     const box=$('#cartItems');
-    if(!items.length){ box.innerHTML='<div class="empty"><div style="font-size:34px;margin-bottom:10px">🌷</div><h3>Корзина пока пуста</h3><p>Выберите букет, который понравится.</p></div>'; }
-    else box.innerHTML=items.map(([p,q])=>`<div class="cart-item"><img src="${p.image}" alt="${escapeHtml(p.name)}"><div><h4>${escapeHtml(p.name)}</h4><p>${money(p.price)} × ${q}</p><div class="qty"><button type="button" data-minus="${p.id}">−</button><b>${q}</b><button type="button" data-plus="${p.id}">+</button></div></div><button class="remove" type="button" data-remove="${p.id}" aria-label="Удалить">×</button></div>`).join('');
+    if(!items.length){ box.innerHTML='<div class="empty"><div class="empty-flower">✿</div><h3>Корзина пока пуста</h3><p>Выберите букет — мы красиво всё упакуем.</p></div>'; }
+    else box.innerHTML=items.map(([p,q])=>`<div class="cart-item"><img src="${p.image}" alt="${escapeHtml(p.name)}"><div><h4>${escapeHtml(p.name)}</h4><p>${money(p.price)}</p><div class="qty"><button type="button" data-minus="${p.id}">−</button><b>${q}</b><button type="button" data-plus="${p.id}">+</button></div></div><button class="remove" type="button" data-remove="${p.id}" aria-label="Удалить">×</button></div>`).join('');
     $('#checkoutLink').classList.toggle('disabled', !items.length);
   }
-  function escapeHtml(s){return String(s).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
   function openCart(){ render(); $('#cart').classList.add('open'); $('#cart').setAttribute('aria-hidden','false'); $('#overlay').classList.add('show'); document.body.classList.add('cart-lock'); }
   function closeCart(){ $('#cart').classList.remove('open'); $('#cart').setAttribute('aria-hidden','true'); $('#overlay').classList.remove('show'); document.body.classList.remove('cart-lock'); }
   function add(id){const c=cart(); c[id]=(Number(c[id])||0)+1; save(c); render(); toast('Букет добавлен в корзину'); openCart();}
   function change(id,d){const c=cart(); c[id]=(Number(c[id])||0)+d; if(c[id]<=0) delete c[id]; save(c); render();}
   function toast(t){const el=document.createElement('div');el.className='toast';el.textContent=t;$('#toastWrap').appendChild(el);setTimeout(()=>el.remove(),2200);}
+  function openProduct(id){const p=productMap[String(id)]; if(!p) return; $('#modalImage').src=p.image; $('#modalImage').alt=p.name; $('#modalName').textContent=p.name; $('#modalDescription').textContent=p.description || 'Авторская композиция из свежих сезонных цветов.'; $('#modalPrice').textContent=money(p.price); $('#modalCategory').textContent=(p.category_name || 'АВТОРСКИЙ БУКЕТ').toUpperCase(); $('#modalAdd').dataset.add=p.id; $('#productModal').classList.add('open'); $('#productModal').setAttribute('aria-hidden','false'); document.body.classList.add('modal-lock'); }
+  function closeProduct(){ $('#productModal').classList.remove('open'); $('#productModal').setAttribute('aria-hidden','true'); document.body.classList.remove('modal-lock'); }
   document.addEventListener('click',e=>{
-    const addBtn=e.target.closest('[data-add]'); if(addBtn){e.preventDefault();add(addBtn.dataset.add);return;}
+    const addBtn=e.target.closest('[data-add]'); if(addBtn){e.preventDefault();add(addBtn.dataset.add); if($('#productModal').classList.contains('open')) closeProduct(); return;}
+    const view=e.target.closest('[data-view]'); if(view){e.preventDefault();openProduct(view.dataset.view);return;}
     const plus=e.target.closest('[data-plus]'); if(plus){change(plus.dataset.plus,1);return;}
     const minus=e.target.closest('[data-minus]'); if(minus){change(minus.dataset.minus,-1);return;}
     const rem=e.target.closest('[data-remove]'); if(rem){const c=cart();delete c[rem.dataset.remove];save(c);render();return;}
   });
-  $('#cartOpen').addEventListener('click',openCart); $('#cartClose').addEventListener('click',closeCart); $('#overlay').addEventListener('click',closeCart);
+  $('#cartOpen').addEventListener('click',openCart); $('#cartClose').addEventListener('click',closeCart); $('#overlay').addEventListener('click',closeCart); $('#productModalClose').addEventListener('click',closeProduct);
+  $('#productModal').addEventListener('click',e=>{if(e.target.id==='productModal')closeProduct();});
   $('#checkoutLink').addEventListener('click',e=>{if(count(cart())===0)e.preventDefault();});
-  window.LAVANDA_CART={cart,save,render,openCart,closeCart,count,products,productMap,money};
-  render();
-  window.addEventListener('pageshow',render);
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeProduct();}});
+  window.LAVANDA_CART={cart,save,render,openCart,closeCart,count,products,productMap,money}; render(); window.addEventListener('pageshow',render);
 })();
 </script>
 {% block scripts %}{% endblock %}

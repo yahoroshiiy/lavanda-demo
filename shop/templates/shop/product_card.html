@@ -1,4 +1,4 @@
 <article class="product">
-  <div class="product-img"><img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy">{% if p.is_hit %}<span class="tag">Хит</span>{% endif %}</div>
-  <div class="product-info"><h3>{{ p.name }}</h3><p>{{ p.description|default:'Авторский букет • свежие цветы'|truncatechars:55 }}</p><div class="product-bottom"><span class="price">{{ p.price|floatformat:0 }} ₽</span><button class="add" type="button" data-add="{{ p.id }}" aria-label="Добавить {{ p.name }}">+</button></div></div>
+  <button class="product-photo" type="button" data-view="{{ p.id }}" aria-label="Подробнее о {{ p.name }}"><img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy">{% if p.is_hit %}<span class="tag">БЕСТСЕЛЛЕР</span>{% endif %}<span class="quick-view">Подробнее <b>↗</b></span></button>
+  <div class="product-info"><div class="product-category">{{ p.category.name|default:'FLOWERS' }}</div><h3>{{ p.name }}</h3><p>{{ p.description|default:'Авторский букет из свежих цветов'|truncatechars:62 }}</p><div class="product-bottom"><span class="price">{{ p.price|floatformat:0 }} ₽</span><button class="add" type="button" data-add="{{ p.id }}" aria-label="Добавить {{ p.name }}"><span>+</span></button></div></div>
 </article>
