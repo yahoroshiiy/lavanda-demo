@@ -26,6 +26,11 @@
   <div><small>СТУДИЯ</small><p>ул. Ленина, 10<br>Ежедневно 09:00–21:00</p></div>
 </footer>
 
+<button class="mobile-cart-bar" id="mobileCartBar" type="button" aria-label="Открыть корзину">
+  <span class="mobile-cart-icon">🛍</span>
+  <span><b id="mobileCartCount">0 товаров</b><small id="mobileCartTotal">0 ₽</small></span>
+  <strong>Корзина&nbsp; →</strong>
+</button>
 <div class="overlay" id="overlay"></div>
 <aside class="cart-drawer" id="cart" aria-hidden="true">
   <div class="cart-head"><div><div class="eyebrow">ВАШ ВЫБОР</div><h3>Корзина</h3></div><button id="cartClose" type="button" aria-label="Закрыть">×</button></div>
@@ -56,7 +61,7 @@ window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v5
   function render(){
     const c=cart(), items=[]; let total=0;
     Object.keys(c).forEach(id=>{ const p=productMap[id], q=Number(c[id]); if(p && q>0){ items.push([p,q]); total += p.price*q; }});
-    $('#cartCount').textContent=count(c); $('#cartTotal').textContent=money(total);
+    $('#cartCount').textContent=count(c); $('#cartTotal').textContent=money(total); const mobileBar=$('#mobileCartBar'); if(mobileBar){ const n=count(c); mobileBar.classList.toggle('show', n>0); $('#mobileCartCount').textContent=n===1?'1 товар':(n<5?`${n} товара`:`${n} товаров`); $('#mobileCartTotal').textContent=money(total); }
     const box=$('#cartItems');
     if(!items.length){ box.innerHTML='<div class="empty"><div class="empty-flower">✿</div><h3>Корзина пока пуста</h3><p>Выберите букет — мы красиво всё упакуем.</p></div>'; }
     else box.innerHTML=items.map(([p,q])=>`<div class="cart-item"><img src="${p.image}" alt="${escapeHtml(p.name)}"><div><h4>${escapeHtml(p.name)}</h4><p>${money(p.price)}</p><div class="qty"><button type="button" data-minus="${p.id}">−</button><b>${q}</b><button type="button" data-plus="${p.id}">+</button></div></div><button class="remove" type="button" data-remove="${p.id}" aria-label="Удалить">×</button></div>`).join('');
@@ -76,7 +81,7 @@ window.LAVANDA = { products: window.LAVANDA_PRODUCTS, key: 'lavanda_demo_cart_v5
     const minus=e.target.closest('[data-minus]'); if(minus){change(minus.dataset.minus,-1);return;}
     const rem=e.target.closest('[data-remove]'); if(rem){const c=cart();delete c[rem.dataset.remove];save(c);render();return;}
   });
-  $('#cartOpen').addEventListener('click',openCart); $('#cartClose').addEventListener('click',closeCart); $('#overlay').addEventListener('click',closeCart); $('#productModalClose').addEventListener('click',closeProduct);
+  $('#cartOpen').addEventListener('click',openCart); const mobileCartBar=$('#mobileCartBar'); if(mobileCartBar) mobileCartBar.addEventListener('click',openCart); $('#cartClose').addEventListener('click',closeCart); $('#overlay').addEventListener('click',closeCart); $('#productModalClose').addEventListener('click',closeProduct);
   $('#productModal').addEventListener('click',e=>{if(e.target.id==='productModal')closeProduct();});
   $('#checkoutLink').addEventListener('click',e=>{if(count(cart())===0)e.preventDefault();});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeProduct();}});
