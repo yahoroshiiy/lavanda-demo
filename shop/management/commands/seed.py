@@ -14,15 +14,16 @@ class Command(BaseCommand):
             Category.objects.get_or_create(slug=slug, defaults={"name": name})
 
         data = [
-            ("Розовый сад", "roses", 4290, True, "Пышный букет из розовых роз, эвкалипта и сезонной зелени.", "https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1000&q=88"),
-            ("Пионовая дымка", "mixed", 4890, True, "Нежная пастельная композиция с пионами, садовыми розами и ранункулюсами.", "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1000&q=88"),
-            ("Белая классика", "minimal", 3790, False, "Белые садовые розы, эвкалипт и немного воздушной зелени.", "https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=1000&q=88"),
-            ("Сезонный букет", "mixed", 3590, False, "Живой сборный букет в оттенках кремового, персикового и зелёного.", "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=1000&q=88"),
-            ("Пудровая любовь", "roses", 5290, True, "Премиальная композиция из пудровых роз с мягкой зеленью.", "https://images.unsplash.com/photo-1495231916356-a86217efff12?auto=format&fit=crop&w=1000&q=88"),
-            ("Лёгкий день", "minimal", 2990, False, "Небольшой букет в спокойной гамме — для знака внимания без повода.", "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=1000&q=88"),
-            ("Красный акцент", "roses", 4590, False, "Выразительные красные розы, собранные в классическую круглую форму.", "https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?auto=format&fit=crop&w=1000&q=88"),
-            ("Тихая роскошь", "minimal", 5590, True, "Сдержанная композиция в молочно-зелёной гамме для особенного события.", "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=1000&q=88"),
+            ("Розовый сад", "roses", 4290, True, "Пышная композиция из розовых роз и нежной зелени.", "https://images.pexels.com/photos/16131098/pexels-photo-16131098.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Белая классика", "minimal", 3790, True, "Воздушный букет из белых роз в спокойной элегантной гамме.", "https://images.pexels.com/photos/18310105/pexels-photo-18310105.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Пионовое облако", "mixed", 5190, True, "Нежные розовые пионы и сезонная зелень — мягкий акцент для особенного дня.", "https://images.pexels.com/photos/26241142/pexels-photo-26241142.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Нежный рассвет", "mixed", 4590, False, "Сочетание розовых и белых роз в лёгкой натуральной упаковке.", "https://images.pexels.com/photos/13475845/pexels-photo-13475845.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Розовый шелк", "roses", 4890, True, "Плотный букет из ярких роз — выразительный и праздничный.", "https://images.pexels.com/photos/1447367/pexels-photo-1447367.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Весенние тюльпаны", "mixed", 3290, False, "Свежие розовые тюльпаны с зеленью — лёгкий букет без лишней торжественности.", "https://images.pexels.com/photos/11423480/pexels-photo-11423480.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Красный акцент", "roses", 5290, False, "Классические красные розы для сильного и красивого жеста.", "https://images.pexels.com/photos/17352951/pexels-photo-17352951.jpeg?auto=compress&cs=tinysrgb&w=1000"),
+            ("Садовая история", "minimal", 5590, True, "Смешанная композиция из садовых роз и зелени с естественной фактурой.", "https://images.pexels.com/photos/19174029/pexels-photo-19174029.jpeg?auto=compress&cs=tinysrgb&w=1000"),
         ]
+        Product.objects.exclude(name__in=[row[0] for row in data]).update(is_active=False)
         for name, slug, price, hit, desc, image in data:
             Product.objects.update_or_create(
                 name=name,
